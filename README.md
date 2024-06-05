@@ -2,10 +2,11 @@
 
 
 ## About Project
-Hardware shop is based on Laravel 11, and PHP 8.3
+Hardware shop is based on Laravel 11, and PHP 8.3.
 
 ## Installation
 - php artisan storage:link
+- php artisan migrate
 
 ## Deploy
 
