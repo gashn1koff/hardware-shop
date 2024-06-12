@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use Carbon\CarbonInterval;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -35,7 +37,6 @@ class AppServiceProvider extends ServiceProvider
             // log
         });
 
-        // TODO: request
 
         RateLimiter::for('global', function (Request $request) {
             return Limit::perMinute(200)
@@ -44,5 +45,13 @@ class AppServiceProvider extends ServiceProvider
                     return response('Too many requests.', Response::HTTP_TOO_MANY_REQUESTS, $headers);
                 });
         });
+
+        $kernel = app(Kernel::class);
+        $kernel->whenRequestLifecycleIsLongerThan(
+            CarbonInterval::seconds(5),
+            function () {
+
+            }
+        );
     }
 }

@@ -5,6 +5,7 @@
 Hardware shop is based on Laravel 11, and PHP 8.3.
 
 ## Installation
+- composer install
 - php artisan storage:link
 - php artisan migrate
 
