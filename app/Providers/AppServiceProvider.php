@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Contracts\TelegramBotApiContract;
+use App\Services\Telegram\TelegramBotApi;
 use Carbon\CarbonInterval;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Request;
@@ -14,6 +17,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AppServiceProvider extends ServiceProvider
 {
+
+    public array $bindings = [
+        TelegramBotApiContract::class => TelegramBotApi::class,
+    ];
+
     /**
      * Register any application services.
      */
@@ -33,8 +41,8 @@ class AppServiceProvider extends ServiceProvider
         Model::preventSilentlyDiscardingAttributes(!app()->isProduction());
 
         // notify when query is long
-        DB::whenQueryingForLongerThan(500, function () {
-            // log
+        DB::whenQueryingForLongerThan(500, function (Connection $connection) {
+            logger()->channel('telegram')->debug('Too long query: ' . $connection->query()->toSql());
         });
 
 
@@ -49,8 +57,8 @@ class AppServiceProvider extends ServiceProvider
         $kernel = app(Kernel::class);
         $kernel->whenRequestLifecycleIsLongerThan(
             CarbonInterval::seconds(5),
-            function () {
-
+            function (Request $request) {
+                logger()->channel('telegram')->debug('Too long request: ' . $request->url());
             }
         );
     }
