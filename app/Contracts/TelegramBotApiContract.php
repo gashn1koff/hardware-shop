@@ -11,5 +11,5 @@ interface TelegramBotApiContract
      * @param string $message
      * @return void
      */
-    public static function sendMessage(string $chatId, string $token, string $message): void;
+    public static function sendMessage(string $chatId, string $token, string $message): bool;
 }
