@@ -8,6 +8,7 @@ use Carbon\CarbonInterval;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::shouldBeStrict(!app()->isProduction());
+
+        if (app()->isProduction()) {
+            DB::listen(function (QueryExecuted $query) {
+                if ($query->time > 100) {
+                    logger()
+                        ->channel('telegram')
+                        ->debug('Query is more than 1s, ' . $query->sql, $query->bindings);
+                }
+            });
+        }
+
         Model::preventLazyLoading(!app()->isProduction());
 
         // when updating field that is not in "fillable"
