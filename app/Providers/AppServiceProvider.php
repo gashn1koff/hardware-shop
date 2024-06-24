@@ -67,8 +67,8 @@ class AppServiceProvider extends ServiceProvider
                 });
         });
 
-        $kernel = app(Kernel::class);
-        $kernel->whenRequestLifecycleIsLongerThan(
+
+        app(Kernel::class)->whenRequestLifecycleIsLongerThan(
             CarbonInterval::seconds(5),
             function (Request $request) {
                 logger()->channel('telegram')->debug('Too long request: ' . $request->url());
