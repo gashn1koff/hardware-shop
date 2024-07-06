@@ -36,6 +36,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        // when updating field that is not in "fillable"
+        // more info in method
         Model::shouldBeStrict(!app()->isProduction());
 
         if (app()->isProduction()) {
@@ -47,11 +50,6 @@ class AppServiceProvider extends ServiceProvider
                 }
             });
         }
-
-        Model::preventLazyLoading(!app()->isProduction());
-
-        // when updating field that is not in "fillable"
-        Model::preventSilentlyDiscardingAttributes(!app()->isProduction());
 
         // notify when query is long
         DB::whenQueryingForLongerThan(500, function (Connection $connection) {
