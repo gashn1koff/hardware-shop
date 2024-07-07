@@ -43,19 +43,25 @@ class AppServiceProvider extends ServiceProvider
 
         if (app()->isProduction()) {
             DB::listen(function (QueryExecuted $query) {
-                if ($query->time > 100) {
+                if ($query->time > 1000) {
                     logger()
                         ->channel('telegram')
                         ->debug('Query is more than 1s, ' . $query->sql, $query->bindings);
                 }
             });
+
+            app(Kernel::class)->whenRequestLifecycleIsLongerThan(
+                CarbonInterval::seconds(5),
+                function (Request $request) {
+                    logger()->channel('telegram')->debug('Too long request: ' . $request->url());
+                }
+            );
         }
 
-        // notify when query is long
-        DB::whenQueryingForLongerThan(500, function (Connection $connection) {
+        // notify when total amount of queries is long
+        DB::whenQueryingForLongerThan(CarbonInterval::seconds(4), function (Connection $connection) {
             logger()->channel('telegram')->debug('Too long query: ' . $connection->query()->toSql());
         });
-
 
         RateLimiter::for('global', function (Request $request) {
             return Limit::perMinute(200)
@@ -65,12 +71,5 @@ class AppServiceProvider extends ServiceProvider
                 });
         });
 
-
-        app(Kernel::class)->whenRequestLifecycleIsLongerThan(
-            CarbonInterval::seconds(5),
-            function (Request $request) {
-                logger()->channel('telegram')->debug('Too long request: ' . $request->url());
-            }
-        );
     }
 }
