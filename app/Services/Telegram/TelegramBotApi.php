@@ -19,7 +19,7 @@ class TelegramBotApi implements TelegramBotApiContract
             ]);
 
             if (!$response->successful()) {
-                throw new TelegramBotException('Telegram bot is not available.');
+                throw new TelegramBotException('Telegram bot is not available. Error message for telegram bot: ' . $message);
             }
             return true;
         } catch (TelegramBotException $e) {
