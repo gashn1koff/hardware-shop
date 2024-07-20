@@ -11,7 +11,7 @@ trait HasSlug
     protected static function bootHasSlug()
     {
         static::creating(function (Model $model) {
-            $model->slug = $model->slug ?? str($model->{self::slugFrom()})->append(time())->slug();
+            $model->slug = $model->slug ?? str($model->{self::slugFrom()})->append(time() . random_int(0, 12))->slug();
         });
     }
 

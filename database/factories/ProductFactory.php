@@ -18,7 +18,11 @@ class ProductFactory extends Factory
     {
         return [
             'title' => ucfirst($this->faker->words(2, true)),
-            'thumbnail' => '',
+            'thumbnail' => $this->faker->file(
+                base_path('/tests/Fixtures/images/'),
+                storage_path('app/public/images/'),
+                false
+            ),
             'description' => ucfirst($this->faker->words(5, true)),
             'price' => $this->faker->numberBetween(1000, 2000000),
         ];
